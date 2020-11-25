@@ -5,6 +5,12 @@
     <section class="visualisation">
       <h1>Beschikbare parkeerplaatsen</h1>
       <h2><span class="day">MAANDAG</span> <span class="time">12:00</span></h2>
+      <div class="percentage">
+        <input type="checkbox" />
+        <span>Totalen</span>
+        <div></div>
+        <span>Percentages</span>
+      </div>
       <div class="svg-container">
         <svg
           viewBox="0 0 1200 600"
@@ -65,13 +71,27 @@ export default {
     data: Array,
   },
   mounted() {
+    this.setSomeValuesFirst();
     this.createChart();
   },
   methods: {
+    setSomeValuesFirst: function () {
+      const day = localStorage.getItem("day"),
+        time = localStorage.getItem("time"),
+        percentages = localStorage.getItem("percentages");
+      document.querySelector("input[type=range]").value = time;
+      document.querySelector("input[value=" + day + "]").checked = true;
+      if (percentages == "true") {
+        document.querySelector(".percentage input").checked = true;
+        document.querySelector("#app").classList.add("perc");
+      }
+    },
     createChart: function () {
       let workArray = JSON.parse(localStorage.getItem("workArray"));
-      let selectedCities = ["Amsterdam", "Delft", "Assen", "Den Haag"];
-
+      let selectedCities;
+      if (localStorage.getItem("selectedCities"))
+        selectedCities = JSON.parse(localStorage.getItem("selectedCities"));
+      else selectedCities = ["Amsterdam", "Delft", "Assen", "Den Haag"];
       // Set up some stuff. SVG = SVG, width=width etc.
       const svg = d3.select("svg");
       const width = 1200;
@@ -84,7 +104,7 @@ export default {
       const innerHeight = height - margin.top - margin.bottom;
 
       // The yScale. The y axis and the data is run against this function so that everything is in proportion.
-      const yScale = d3
+      let yScale = d3
         .scaleLinear()
         .domain([0, 8500]) // was set to d3.max(something) making the axis dynamic. I put this to 8500
         // (the max data output) so the relation between days is visually stronger
@@ -103,6 +123,7 @@ export default {
         workArray,
         selectedCities
       );
+      getCityTotals(workArray);
       makeGraphsWithD3(combinedCityCapacityObjects);
 
       function createCityInputs(data) {
@@ -138,9 +159,26 @@ export default {
         return addCapacities(openedCityObjects, selectedCities);
       }
 
+      function getCityTotals(data) {
+        let allCityNames = [];
+        for (let i in data) {
+          if (!allCityNames.includes(data[i].stad)) {
+            allCityNames.push(data[i].stad);
+          }
+        }
+
+        let selectedCityObjects = data.filter((d) =>
+          isCityMatch(d, allCityNames)
+        );
+
+        let mergedData = addCapacities(selectedCityObjects, allCityNames);
+
+        localStorage.setItem("cityTotals", JSON.stringify(mergedData));
+      }
+
       function isObjectOpened(cityObject) {
-        const day = document.querySelector("input[type=radio]:checked").value;
-        const time = document.querySelector("input[type=range").value * 100;
+        const day = document.querySelector("input[type=radio]:checked").value,
+          time = document.querySelector("input[type=range").value * 100;
 
         const objectDag = cityObject.openingstijden.find((d) => d.days == day);
 
@@ -173,7 +211,27 @@ export default {
         return false;
       }
 
+      function transformToPercentages(dataEntry) {
+        const allCityTotals = JSON.parse(localStorage.getItem("cityTotals"));
+        let percentage, i;
+        for (i = 0; i < allCityTotals.length; i++) {
+          if (allCityTotals[i].stad == dataEntry.stad) {
+            percentage = parseInt(
+              (dataEntry.capaciteit / allCityTotals[i].capaciteit) * 100
+            );
+          }
+        }
+        return { stad: dataEntry.stad, capaciteit: parseInt(percentage) };
+      }
+
       function makeGraphsWithD3(workableData) {
+        let percentages = localStorage.getItem("percentages");
+        if (percentages == "true") {
+          workableData = workableData.map(transformToPercentages);
+          yScale = d3.scaleLinear().domain([0, 100]).range([innerHeight, 0]); //
+        } else {
+          yScale = d3.scaleLinear().domain([0, 8500]).range([innerHeight, 0]); //
+        }
         const render = (data) => {
           const xScale = d3
             .scaleBand()
@@ -201,6 +259,13 @@ export default {
       }
 
       function update(workableData) {
+        let percentages = localStorage.getItem("percentages");
+        if (percentages == "true") {
+          workableData = workableData.map(transformToPercentages);
+          yScale = d3.scaleLinear().domain([0, 100]).range([innerHeight, 0]); //
+        } else {
+          yScale = d3.scaleLinear().domain([0, 8500]).range([innerHeight, 0]); //
+        }
         const render = (data) => {
           const xScale = d3
             .scaleBand()
@@ -260,6 +325,7 @@ export default {
           workArray,
           selectedCities
         );
+        localStorage.setItem("time", this.value);
         update(combinedCityCapacityObjects);
         updateTitle();
       });
@@ -268,9 +334,13 @@ export default {
       d3.selectAll(".cities").on("click", function (e) {
         if (e.target.type == "checkbox") {
           if (e.target.checked) selectedCities.push(e.target.value);
-          else
+          else {
             selectedCities = selectedCities.filter((d) => d != e.target.value);
-
+          }
+          localStorage.setItem(
+            "selectedCities",
+            JSON.stringify(selectedCities)
+          );
           let combinedCityCapacityObjects = mergeCityCapacities(
             workArray,
             selectedCities
@@ -279,12 +349,29 @@ export default {
         }
       });
 
-      // DAYS RADIOS
-      d3.selectAll("input[type=radio]").on("change", function () {
+      // PERCENTAGE YES/NO
+      d3.select(".percentage").on("change", function (e) {
+        if (e.target.checked) {
+          localStorage.setItem("percentages", true);
+          document.querySelector("#app").classList.add("perc");
+        } else {
+          localStorage.setItem("percentages", false);
+          document.querySelector("#app").classList.remove("perc");
+        }
         let combinedCityCapacityObjects = mergeCityCapacities(
           workArray,
           selectedCities
         );
+        update(combinedCityCapacityObjects);
+      });
+
+      // DAYS RADIOS
+      d3.selectAll("input[type=radio]").on("change", function setDay() {
+        let combinedCityCapacityObjects = mergeCityCapacities(
+          workArray,
+          selectedCities
+        );
+        localStorage.setItem("day", this.value);
         update(combinedCityCapacityObjects);
         updateTitle();
       });
@@ -416,6 +503,11 @@ input[type="radio"]:checked + label {
   border-radius: 0.2rem;
   padding: 0.2rem;
   font-size: 0.8rem;
+  transition: 500ms ease;
+}
+.perc input[type="radio"]:checked + label {
+  background: #bfe3b4;
+  color: #353535;
 }
 
 .citiesbox {
@@ -465,9 +557,54 @@ input[type="radio"]:checked + label {
   background: steelblue;
   border: 0.5px solid transparent;
 }
+.perc .cities input:checked ~ label::after {
+  background: #bfe3b4;
+}
 .cities input:hover ~ label::after {
   transform: scale(1.2);
   transform-origin: center;
+}
+
+.percentage {
+  position: absolute;
+  top: 8%;
+  left: 50%;
+  display: flex;
+}
+.percentage input {
+  position: absolute;
+  top: 0%;
+  left: 0%;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  z-index: 3;
+}
+.percentage div {
+  width: 2rem;
+  height: 28px;
+  background: #aaa;
+  border-radius: 28px;
+  margin: 0 0.5rem;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.percentage div::after {
+  content: "";
+  display: block;
+  border-radius: 50%;
+  background: steelblue;
+  position: absolute;
+  height: 0;
+  width: 70%;
+  padding-bottom: 70%;
+  transition: 500ms ease;
+  left: 0;
+}
+.percentage input:checked ~ div::after {
+  transform: translateX(43%);
+  background: #bfe3b4;
 }
 
 @media only screen and (max-width: 1200px) and (min-width: 800px) {
@@ -487,20 +624,37 @@ input[type="radio"]:checked + label {
     width: 10rem;
   }
   .citiesbox {
-  width: 25%;
-  height: 50%;
+    width: 25%;
+    height: 50%;
+  }
+  .percentage {
+    left: auto;
+    right: 10%;
   }
 }
-
-
 
 @media only screen and (max-width: 800px) {
   div#chart {
     flex-direction: column;
   }
-    div#chart .visualisation {
+  div#chart .visualisation {
     width: 100%;
   }
-  section.inputs  { margin: 0 auto; }
+  section.inputs {
+    margin: 0 auto;
+  }
+  .percentage {
+    left: auto;
+    right: 10%;
+    transform: scale(0.7);
+    transform-origin: right;
+  }
+  h1,
+  h2 {
+    margin-left: 0.5rem;
+  }
+  .cities {
+    height: 40%;
+  }
 }
 </style>
