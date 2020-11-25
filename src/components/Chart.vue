@@ -97,7 +97,7 @@ export default {
       const width = 1200;
       const height = 600;
       //Get some margins otherwise the axis will fall outside the SVG.
-      const margin = { top: 20, right: 50, bottom: 50, left: 75 };
+      const margin = { top: 50, right: 50, bottom: 50, left: 100 };
 
       //Then calc an innerwidth and height.
       const innerWidth = width - margin.left - margin.right;
@@ -238,6 +238,7 @@ export default {
             .domain(data.map((d) => d.stad))
             .range([0, innerWidth])
             .padding(0.1);
+
           g.append("g").call(d3.axisLeft(yScale)).attr("class", "ax y");
           g.append("g")
             .call(d3.axisBottom(xScale))
@@ -253,6 +254,17 @@ export default {
             .attr("y", (d) => yScale(+d.capaciteit))
             .attr("height", (d) => innerHeight - yScale(+d.capaciteit))
             .attr("class", "bar");
+
+            g.selectAll('text.bartext')
+              .data(data)
+              .enter().append('text')
+                .attr('class','bartext')
+                .attr('text-anchor','middle')
+                .attr('x', (d) => xScale(d.stad) + (xScale.bandwidth() / 2 ))
+                .attr("width", xScale.bandwidth())
+                .attr('y', (d) => yScale(+d.capaciteit))
+                .attr("transform", 'translate(0, -10)')
+                .text((d) => parseInt(+d.capaciteit));
         };
         //and put it to work!
         render(workableData);
@@ -297,13 +309,36 @@ export default {
             .attr("width", xScale.bandwidth()) // same width
             .attr("height", (d) => innerHeight - yScale(+d.capaciteit)); // same height
 
-          let oldBars = d3
-            .select(".barbox")
-            .selectAll("rect") // selecting the bars that are already made, putting them into a variable.
-            .data(data); // put in the new data
-          oldBars
+          allBars
             .exit() // focus on what's old.
             .remove(); // and get rid of that.
+
+
+          //update texts
+            let allTexts = g.selectAll('text.bartext')
+              .data(data);
+
+              allTexts
+                .text((d) => (+d.capaciteit));
+
+              allTexts
+              .enter().append('text')
+              // FROM
+                .attr('class','bartext')
+                .attr('text-anchor','middle')
+                .attr("transform", 'translate(0, -10)')
+                .attr("x", width) 
+                .attr("y", (d) => height - yScale(d.capaciteit))
+                .text((d) => parseInt(+d.capaciteit))
+                .merge(allTexts)
+                .transition().duration(500)
+
+              // TO
+                .attr('x', (d) => xScale(d.stad) + (xScale.bandwidth() / 2 ))
+                .attr("width", xScale.bandwidth())
+                .attr('y', (d) => yScale(+d.capaciteit));
+
+              allTexts.exit().remove();
 
           // update Axis
           g.selectAll(".ax.y")
@@ -506,8 +541,7 @@ input[type="radio"]:checked + label {
   transition: 500ms ease;
 }
 .perc input[type="radio"]:checked + label {
-  background: #bfe3b4;
-  color: #353535;
+  background: maroon;
 }
 
 .citiesbox {
@@ -558,7 +592,7 @@ input[type="radio"]:checked + label {
   border: 0.5px solid transparent;
 }
 .perc .cities input:checked ~ label::after {
-  background: #bfe3b4;
+  background: maroon;
 }
 .cities input:hover ~ label::after {
   transform: scale(1.2);
@@ -583,13 +617,18 @@ input[type="radio"]:checked + label {
 .percentage div {
   width: 2rem;
   height: 28px;
-  background: #aaa;
+  background: #E9E9E9;
   border-radius: 28px;
   margin: 0 0.5rem;
   position: relative;
   display: flex;
   align-items: center;
+  transition: 500ms ease;
 }
+.perc .percentage div {
+  background: #aaa;
+}
+
 .percentage div::after {
   content: "";
   display: block;
@@ -604,7 +643,7 @@ input[type="radio"]:checked + label {
 }
 .percentage input:checked ~ div::after {
   transform: translateX(43%);
-  background: #bfe3b4;
+  background: maroon;
 }
 
 @media only screen and (max-width: 1200px) and (min-width: 800px) {

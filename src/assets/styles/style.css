@@ -30,10 +30,14 @@ h4 {font-size: 1.2rem;}
 }
 
 rect {fill: steelblue; transition: fill 500ms ease;}
-.perc rect {fill: #bfe3b4;}
+.perc rect {fill: maroon;}
+
+.bartext { fill: steelblue; font-size: 0.6rem; font-weight: 400}
+.perc .bartext { fill: maroon;}
 
 @media only screen and (max-width: 800px) {
     text{ font-size: 1rem;}
+    .bartext {font-size: 1rem}
 }
 
  
@@ -50,4 +54,4 @@ section.inputs .cities input:checked ~ label::after {background: steelblue; bord
 section.inputs .cities input:hover ~ label::after {transform: scale(1.2); transform-origin: center;}
 
 
-.perc section.inputs .cities input:checked ~ label::after {background: #bfe3b4;}
+.perc section.inputs .cities input:checked ~ label::after {background: maroon;}
