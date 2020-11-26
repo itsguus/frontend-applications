@@ -21,7 +21,7 @@
     </section>
 
     <section class="inputs">
-      <div class="days">
+      <fieldset class="days">
         <h3>DAG</h3>
         <input
           type="radio"
@@ -43,17 +43,17 @@
         <label for="ZATERDAG">ZA</label>
         <input type="radio" name="DAY" value="ZONDAG" id="ZONDAG" />
         <label for="ZONDAG">ZO</label>
-      </div>
-      <div class="time">
+      </fieldset>
+      <fieldset class="time">
         <h3>TIJD <span></span></h3>
         <span>0:00</span>
         <input type="range" name="time" id="time" min="0" max="24" value="12" />
         <span>24:00</span>
-      </div>
-      <div class="citiesbox">
+      </fieldset>
+      <fieldset class="citiesbox">
         <h3>STEDEN</h3>
-        <div class="cities"></div>
-      </div>
+        <fieldset class="cities"></fieldset>
+      </fieldset>
     </section>
   </div>
 </template>
@@ -612,6 +612,12 @@ input[type="radio"]:checked + label {
   left: 50%;
   display: flex;
 }
+
+@media only screen and(max-width: 600px) {
+  .percentage {
+    top: 16%;
+  }
+}
 .percentage input {
   position: absolute;
   top: 0%;
@@ -654,10 +660,6 @@ input[type="radio"]:checked + label {
   background: maroon;
 }
 
-.percentage input ~ span:nth-of-type(1) { font-weight: 400;}
-.percentage input ~ span:nth-of-type(2) { font-weight: 300;}
-.percentage input:checked ~ span:nth-of-type(1) { font-weight: 300;}
-.percentage input:checked ~ span:nth-of-type(2) { font-weight: 400;}
 
 @media only screen and (max-width: 1200px) and (min-width: 800px) {
   div#chart {

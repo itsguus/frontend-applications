@@ -18,10 +18,8 @@ export default {
   data: function () {
     return {
       listItems: [
-        { message: "Hi" },
-        { message: "Ha" },
-        { message: "Ho" },
-        { message: "Huuuuu" },
+        { message: "De data die is gebruikt voor het maken van de visualisatie komt van het RDW." },
+        { message: "Niet alle parkeergelegenheden in Nederland hebben de voor deze visualisatie benodigde data beschikbaar. Hierdoor bestaat de mogelijkheid dat parkeergelegenheden buiten beschouwing zijn gelaten." },
       ],
     };
   },
@@ -31,6 +29,6 @@ export default {
 
 <style scoped>
  h2 {margin-left: 0; font-family: "Bebas Neue"; font-size: 1.2rem; margin-top: 3rem;}
- ul { list-style-type: circle;}
- ul li {font-size: 0.8rem;}
+ ul { list-style-type: circle; }
+ ul li {font-size: 0.5rem;}
 </style>

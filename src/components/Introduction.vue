@@ -46,7 +46,7 @@ export default {
     .introduction img#redcar {width: 30%;  transform: rotate(90deg); position: sticky; top: 35%; margin-top: -20%;  bottom: 0; margin-bottom: 8%; margin-left: 4.5%;}
 
 
-    .arrow { transform: rotate(90deg); width: 2rem; position: sticky; top: 90%; margin-bottom: 2rem; margin-right: 1rem; left: 95%; animation: bounce 3s ease infinite;}
+    .arrow { transform: rotate(90deg); width: 2rem; position: sticky; top: 90%; margin-bottom: 2rem; margin-right: 1rem; left: 95%; animation: bounce 3s ease infinite; margin-top: -10rem;}
     @keyframes bounce {
         0% {transform: rotate(90deg) translateX(0rem)}
         50% {transform: rotate(90deg) translateX(1rem)}

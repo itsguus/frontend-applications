@@ -35,6 +35,8 @@ rect {fill: steelblue; transition: fill 500ms ease;}
 .bartext { fill: steelblue; font-size: 0.6rem; font-weight: 400}
 .perc .bartext { fill: maroon;}
 
+text { font-size: 0.7rem;}
+
 section { display: flex; flex-direction: column; background: white;}
 section.mw {width: calc(100% - 4rem); max-width: 70rem;}
 section.mw > div {margin: 2rem;}
@@ -48,7 +50,6 @@ section.mw > div {margin: 2rem;}
  
 h1,h2 {margin-left: 2rem;}
 h2 span.day {text-transform: capitalize;}
-
 
 section.inputs .cities label {font-size: 0.8rem; display: inline-block; margin-left: 1rem; user-select: none;}
 section.inputs .cities > div {position: relative; display: flex; align-items: center; margin: 0.2rem 0;}

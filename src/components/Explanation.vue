@@ -28,10 +28,14 @@ export default {
 
 
 <style scoped>
-    h2 {font-size: 2rem; font-family: "Bebas Neue"; margin-left: 0;}
+    .mw h2 {font-size: 2rem; font-family: "Bebas Neue"; margin-left: 0;}
     .top { margin-top: 4rem;}
     p {margin-bottom: 0.6rem; max-width: 35rem;}
     
     .bottom {text-align: right; margin: 4rem 2rem 8rem; }
     .bottom p {margin-left: auto;}
+
+    @media only screen and (max-width: 800px) {
+        .mw h2 { font-size: 1.2rem;}
+    }
 </style>
