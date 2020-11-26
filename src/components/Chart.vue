@@ -7,7 +7,7 @@
       <h2><span class="day">MAANDAG</span> <span class="time">12:00</span></h2>
       <div class="percentage">
         <input type="checkbox" />
-        <span>Totalen</span>
+        <span>Aantallen</span>
         <div></div>
         <span>Percentages</span>
       </div>
@@ -76,9 +76,10 @@ export default {
   },
   methods: {
     setSomeValuesFirst: function () {
-      const day = localStorage.getItem("day"),
-        time = localStorage.getItem("time"),
-        percentages = localStorage.getItem("percentages");
+      let day = "MAANDAG", time = 12,
+          percentages = localStorage.getItem("percentages");
+      if(localStorage.getItem("day")) day = localStorage.getItem("day");
+      if(localStorage.getItem("time")) time = localStorage.getItem("time");
       document.querySelector("input[type=range]").value = time;
       document.querySelector("input[value=" + day + "]").checked = true;
       if (percentages == "true") {
@@ -455,9 +456,12 @@ div#chart {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  max-width: 79rem;
-  width: 100%;
+  max-width: 70rem;
+  width: calc(100% - 4rem);
+  background: white;
 }
+
+
 
 section {
   display: flex;
@@ -473,7 +477,7 @@ h2 span.day {
 }
 
 section.inputs > * {
-  margin-top: 2rem;
+  margin-top: 1rem;
 }
 section.inputs {
   height: 34rem;
@@ -510,6 +514,7 @@ section.inputs .time > h3 span {
 section.visualisation {
   width: 77%;
   align-items: flex-start;
+  position: relative;
 }
 
 input[type="range"] {
@@ -546,13 +551,12 @@ input[type="radio"]:checked + label {
 }
 
 .citiesbox {
-  margin-top: 2rem;
-  height: 100%;
+  height: 50%;
 }
 .cities {
   display: flex;
   flex-direction: column;
-  height: 60%;
+  height: 90%;
   overflow: scroll;
   background: white;
 }
@@ -650,6 +654,11 @@ input[type="radio"]:checked + label {
   background: maroon;
 }
 
+.percentage input ~ span:nth-of-type(1) { font-weight: 400;}
+.percentage input ~ span:nth-of-type(2) { font-weight: 300;}
+.percentage input:checked ~ span:nth-of-type(1) { font-weight: 300;}
+.percentage input:checked ~ span:nth-of-type(2) { font-weight: 400;}
+
 @media only screen and (max-width: 1200px) and (min-width: 800px) {
   div#chart {
     flex-direction: column;
@@ -659,7 +668,7 @@ input[type="radio"]:checked + label {
   }
   section.inputs {
     flex-direction: row;
-    width: 100%;
+    width: calc(100% - 2rem);
     justify-content: space-around;
     margin: 1rem;
   }
@@ -679,6 +688,8 @@ input[type="radio"]:checked + label {
 @media only screen and (max-width: 800px) {
   div#chart {
     flex-direction: column;
+      width: calc(100% - 2rem);
+
   }
   div#chart .visualisation {
     width: 100%;
@@ -697,7 +708,7 @@ input[type="radio"]:checked + label {
     margin-left: 0.5rem;
   }
   .cities {
-    height: 40%;
+    height: 70%;
   }
 }
 </style>
