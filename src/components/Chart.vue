@@ -51,7 +51,7 @@
         <span>24:00</span>
       </fieldset>
       <fieldset class="citiesbox">
-        <h3>STEDEN</h3>
+        <h3>GEMEENTES</h3>
         <fieldset class="cities"></fieldset>
       </fieldset>
     </section>
